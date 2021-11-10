@@ -1,12 +1,38 @@
 import { Avatar, IconButton } from "@material-ui/core";
 import { Chat, DonutLarge, MoreVert, SearchOutlined } from "@material-ui/icons";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import db from "../../firebase";
 import "./Sidebar.css";
 import SidebarChat from "./SidebarChat";
 
 function Sidebar() {
+  const [rooms, setRooms] = useState([]);
+
+  useEffect(() => {
+    db.collection("Rooms").onSnapshot((snapshot) =>
+      setRooms(snapshot.docs.map((doc) => ({ id: doc.id, data: doc.data() })))
+    );
+  }, []);
+
+  const createChat = () => {
+    const roomName = prompt("Please enter room name");
+
+    if (roomName) {
+      db.collection("Rooms").add({
+        name: roomName,
+      });
+    }
+  };
+
   return (
     <div className="sidebar">
+      {/* <button
+        onClick={() => {
+          console.log(rooms);
+        }}
+      >
+        Button
+      </button> */}
       <div className="sidebar-header">
         <Avatar />
         <div className="sidebar-right-icons">
@@ -14,7 +40,7 @@ function Sidebar() {
             <DonutLarge />
           </IconButton>
           <IconButton>
-            <Chat />
+            <Chat onClick={() => createChat()} />
           </IconButton>
           <IconButton>
             <MoreVert />
@@ -29,17 +55,10 @@ function Sidebar() {
       </div>
       <div className="sidebar-chats">
         {/* ADD ARCHIVE SECTION */}
-        {/* {[
-          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        ].map((item) => {
-          return <SidebarChat key={item} />;
-        })} */}
         <SidebarChat addNewChat />
-        <SidebarChat />
-        <SidebarChat />
-        <SidebarChat />
-        <SidebarChat />
+        {rooms.map((room) => (
+          <SidebarChat key={room.id} id={room.id} name={room.data.name} />
+        ))}
       </div>
     </div>
   );

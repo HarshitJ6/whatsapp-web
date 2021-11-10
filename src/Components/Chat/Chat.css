@@ -21,7 +21,7 @@
   padding: 30px;
   overflow: auto;
 }
-.chat-message {
+.chat-message-reciever {
   background-color: white;
   position: relative;
   font-size: 16px;
@@ -29,6 +29,20 @@
   border-radius: 10px;
   width: fit-content;
   margin-bottom: 30px;
+}
+.chat-message-sender {
+  margin-left: auto;
+  background-color: #dcf8c6 !important;
+}
+.chat-message-name {
+  position: absolute;
+  font-size: xx-small;
+  font-weight: 800;
+  top: -13px;
+}
+.chat-message-time {
+  margin-left: 10px;
+  font-size: xx-small;
 }
 .chat-footer {
   display: flex;
