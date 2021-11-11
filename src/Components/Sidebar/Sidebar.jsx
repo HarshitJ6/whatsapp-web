@@ -2,11 +2,13 @@ import { Avatar, IconButton } from "@material-ui/core";
 import { Chat, DonutLarge, MoreVert, SearchOutlined } from "@material-ui/icons";
 import React, { useEffect, useState } from "react";
 import db from "../../firebase";
+import { useStateValue } from "../../StateProvider";
 import "./Sidebar.css";
 import SidebarChat from "./SidebarChat";
 
 function Sidebar() {
   const [rooms, setRooms] = useState([]);
+  const [{ user }, dispatch] = useStateValue();
 
   useEffect(() => {
     db.collection("Rooms").onSnapshot((snapshot) =>
@@ -26,15 +28,16 @@ function Sidebar() {
 
   return (
     <div className="sidebar">
-      {/* <button
+      {/* <img src={user?.photoURL} />
+      <button
         onClick={() => {
-          console.log(rooms);
+          console.log(user.photoURL);
         }}
       >
         Button
       </button> */}
       <div className="sidebar-header">
-        <Avatar />
+        <Avatar src={user?.photoURL} />
         <div className="sidebar-right-icons">
           <IconButton>
             <DonutLarge />

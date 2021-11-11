@@ -1,20 +1,33 @@
 import { Button } from "@material-ui/core";
 import React from "react";
 import { auth, Fprovider, provider } from "../../firebase";
+import { actionTypes } from "../../reducer";
+import { useStateValue } from "../../StateProvider";
 
 import "./Login.css";
 
 function Login() {
-  const signInFB = () => {
-    auth
-      .signInWithPopup(Fprovider)
-      .then((result) => console.log(result))
-      .catch((err) => console.log(err.message));
-  };
+  const [{ user }, dispatch] = useStateValue();
+  // const signInFB = () => {
+  //   auth
+  //     .signInWithPopup(Fprovider)
+  //     .then((result) =>
+  //       dispatch({
+  //         type: actionTypes.SET_USER,
+  //         user: result.user,
+  //       })
+  //     )
+  //     .catch((err) => console.log(err.message));
+  // };
   const signIn = () => {
     auth
       .signInWithPopup(provider)
-      .then((result) => console.log(result))
+      .then((result) =>
+        dispatch({
+          type: actionTypes.SET_USER,
+          user: result.user,
+        })
+      )
       .catch((err) => console.log(err.message));
   };
 

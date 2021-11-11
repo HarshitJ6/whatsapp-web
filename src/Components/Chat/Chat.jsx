@@ -9,13 +9,17 @@ import {
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import db from "../../firebase";
+import { useStateValue } from "../../StateProvider";
 import "./Chat.css";
+import firebase from "firebase";
 
 function Chat() {
   const [seed, setSeed] = useState("");
   const [typeMessage, setTypeMessage] = useState();
   const [roomName, setRoomName] = useState("h");
+  const [messages, setMessages] = useState([]);
   const { roomId } = useParams();
+  const [{ user }, dispatch] = useStateValue();
 
   useEffect(() => {
     // console.log(id);
@@ -23,8 +27,17 @@ function Chat() {
       db.collection("Rooms")
         .doc(roomId)
         .onSnapshot((snapshot) => {
-          console.log("hello", snapshot);
+          // console.log("hello", snapshot);
           setRoomName(snapshot.data().name);
+
+          db.collection("Rooms")
+            .doc(roomId)
+            .collection("messages")
+            .orderBy("timestamp", "asc")
+            .onSnapshot((snapshot) => {
+              // console.log(snapshot);
+              setMessages(snapshot.docs.map((doc) => doc.data()));
+            });
         });
     }
   }, [roomId]);
@@ -37,14 +50,20 @@ function Chat() {
     e.preventDefault();
     // alert(typeMessage);
     setTypeMessage(" ");
+    db.collection("Rooms").doc(roomId).collection("messages").add({
+      name: user.displayName,
+      body: typeMessage,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    });
   }
 
   return (
     <div className="chat">
       {/* <button
         onClick={() => {
-          console.log(roomId);
-          console.log(roomName);
+          console.log(
+            new Date(messages[messages.length - 1]?.timestamp?.toDate())
+          );
         }}
       >
         Log Room Name
@@ -53,7 +72,12 @@ function Chat() {
         <Avatar src={`https://avatars.dicebear.com/api/human/${seed}.svg`} />
         <div className="chat-header-info">
           <h3>{roomName}</h3>
-          <p>Last seen at 2:00 p.m.</p>
+          <p>
+            Last Activity{" "}
+            {new Date(
+              messages[messages.length - 1]?.timestamp?.toDate()
+            ).toUTCString()}
+          </p>
         </div>
         <div className="chat-header-right">
           <IconButton>
@@ -65,11 +89,19 @@ function Chat() {
         </div>
       </div>
       <div className="chat-body">
-        <p className={`chat-message-reciever ${true && "chat-message-sender"}`}>
-          <span className="chat-message-name">Hritik Jain</span>
-          Welcome to Whatsapp Web!
-          <span className="chat-message-time">12:06 pm</span>
-        </p>
+        {messages.map((message) => (
+          <p
+            className={`chat-message-reciever ${
+              user.displayName == message.name && "chat-message-sender"
+            }`}
+          >
+            <span className="chat-message-name">{message.name}</span>
+            {message.body}
+            <span className="chat-message-time">
+              {new Date(message.timestamp?.toDate()).toUTCString()}
+            </span>
+          </p>
+        ))}
       </div>
       <div className="chat-footer">
         <IconButton>

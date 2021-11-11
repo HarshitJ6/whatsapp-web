@@ -4,10 +4,11 @@ import Chat from "./Components/Chat/Chat";
 import Sidebar from "./Components/Sidebar/Sidebar";
 import { useState } from "react";
 import Login from "./Components/Login/Login";
+import { useStateValue } from "./StateProvider";
 
 function App() {
-  const [user, setUser] = useState(null);
-
+  // const [user, setUser] = useState(true);
+  const [{ user }, dispatch] = useStateValue();
   return (
     <div className="app">
       {!user ? (
@@ -16,8 +17,8 @@ function App() {
         <div className="app-body">
           <Router>
             <Sidebar />
-            <Route path="/" element={<Chat />} />
             <Routes>
+              <Route path="/" element={<Chat />} />
               <Route path="/rooms/:roomId" element={<Chat />} />
             </Routes>
             {/* <Chat /> */}
