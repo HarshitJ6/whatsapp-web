@@ -45,3 +45,7 @@
   overflow: auto;
   background-color: white;
 }
+.sidebar-profile-avatar :hover {
+  opacity: 0.5;
+  cursor: pointer;
+}

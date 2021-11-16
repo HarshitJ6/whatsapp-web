@@ -1,10 +1,13 @@
-import { Avatar, IconButton } from "@material-ui/core";
+import { Avatar, Button, IconButton } from "@material-ui/core";
 import { Chat, DonutLarge, MoreVert, SearchOutlined } from "@material-ui/icons";
 import React, { useEffect, useState } from "react";
 import db from "../../firebase";
 import { useStateValue } from "../../StateProvider";
+import ProfileUpload from "../ProfileUpload";
 import "./Sidebar.css";
 import SidebarChat from "./SidebarChat";
+
+const fileTypes = ".png,.jpeg,.jpg";
 
 function Sidebar() {
   const [rooms, setRooms] = useState([]);
@@ -37,7 +40,10 @@ function Sidebar() {
         Button
       </button> */}
       <div className="sidebar-header">
-        <Avatar src={user?.photoURL} />
+        <ProfileUpload extensions={fileTypes}>
+          <Avatar src={user?.photoURL} className="sidebar-profile-avatar" />
+        </ProfileUpload>
+
         <div className="sidebar-right-icons">
           <IconButton>
             <DonutLarge />

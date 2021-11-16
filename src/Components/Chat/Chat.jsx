@@ -12,6 +12,9 @@ import db from "../../firebase";
 import { useStateValue } from "../../StateProvider";
 import "./Chat.css";
 import firebase from "firebase";
+import ProfileUpload from "../ProfileUpload";
+
+const fileTypes = ".pdf";
 
 function Chat() {
   const [seed, setSeed] = useState("");
@@ -108,7 +111,9 @@ function Chat() {
           <InsertEmoticon />
         </IconButton>
         <IconButton>
-          <AttachFile />
+          <ProfileUpload extensions={fileTypes}>
+            <AttachFile />
+          </ProfileUpload>
         </IconButton>
         <form>
           <input
@@ -120,7 +125,6 @@ function Chat() {
             }}
           />
           <button type="submit" onClick={sendMessage}>
-            {" "}
             Send a message{" "}
           </button>
         </form>
