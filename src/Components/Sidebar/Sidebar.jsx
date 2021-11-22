@@ -2,6 +2,7 @@ import { Avatar, Button, IconButton } from "@material-ui/core";
 import { Chat, DonutLarge, MoreVert, SearchOutlined } from "@material-ui/icons";
 import React, { useEffect, useState } from "react";
 import db from "../../firebase";
+import { actionTypes } from "../../reducer";
 import { useStateValue } from "../../StateProvider";
 import ProfileUpload from "../ProfileUpload";
 import "./Sidebar.css";
@@ -11,14 +12,35 @@ const fileTypes = ".png,.jpeg,.jpg";
 
 function Sidebar() {
   const [rooms, setRooms] = useState([]);
-  const [{ user }, dispatch] = useStateValue();
+  const [xyz, dispatch] = useStateValue();
 
   useEffect(() => {
-    db.collection("Rooms").onSnapshot((snapshot) =>
-      setRooms(snapshot.docs.map((doc) => ({ id: doc.id, data: doc.data() })))
+    console.log(xyz);
+    db.collection("profile").onSnapshot((snap) => {
+      console.log(snap.docs[0].id);
+      dispatch({
+        type: actionTypes.SET_ID,
+        dbId: snap.docs[0].id,
+      });
+    });
+    db.collection("profile").onSnapshot((snapshot) =>
+      // setRooms(snapshot.docs.map((doc) => ({ id: doc.id, data: doc.data() })))
+      console.log(snapshot)
     );
   }, []);
 
+  useEffect(() => {
+    if (xyz.dbId) {
+      db.collection("profile")
+        .doc(xyz.dbId)
+        .collection("rooms")
+        .onSnapshot((snapshot) => {
+          setRooms(
+            snapshot.docs.map((doc) => ({ id: doc.id, data: doc.data() }))
+          );
+        });
+    }
+  }, [xyz.dbId]);
   const createChat = () => {
     const roomName = prompt("Please enter room name");
 
@@ -31,17 +53,17 @@ function Sidebar() {
 
   return (
     <div className="sidebar">
-      {/* <img src={user?.photoURL} />
-      <button
+      {/* <img src={user?.photoURL} /> */}
+      {/* <button
         onClick={() => {
-          console.log(user.photoURL);
+          console.log(xyz);
         }}
       >
         Button
       </button> */}
       <div className="sidebar-header">
         <ProfileUpload extensions={fileTypes}>
-          <Avatar src={user?.photoURL} className="sidebar-profile-avatar" />
+          <Avatar src={xyz.user?.photoURL} className="sidebar-profile-avatar" />
         </ProfileUpload>
 
         <div className="sidebar-right-icons">

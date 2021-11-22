@@ -22,18 +22,22 @@ function Chat() {
   const [roomName, setRoomName] = useState("h");
   const [messages, setMessages] = useState([]);
   const { roomId } = useParams();
-  const [{ user }, dispatch] = useStateValue();
+  const [{ user, dbId }, dispatch] = useStateValue();
 
   useEffect(() => {
     // console.log(id);
     if (roomId) {
-      db.collection("Rooms")
+      db.collection("profile")
+        .doc(dbId)
+        .collection("rooms")
         .doc(roomId)
         .onSnapshot((snapshot) => {
           // console.log("hello", snapshot);
           setRoomName(snapshot.data().name);
 
-          db.collection("Rooms")
+          db.collection("profile")
+            .doc(dbId)
+            .collection("rooms")
             .doc(roomId)
             .collection("messages")
             .orderBy("timestamp", "asc")
@@ -53,24 +57,27 @@ function Chat() {
     e.preventDefault();
     // alert(typeMessage);
     setTypeMessage(" ");
-    db.collection("Rooms").doc(roomId).collection("messages").add({
-      name: user.displayName,
-      body: typeMessage,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-    });
+    db.collection("profile")
+      .doc(dbId)
+      .collection("rooms")
+      .doc(roomId)
+      .collection("messages")
+      .add({
+        name: user.displayName,
+        message: typeMessage,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      });
   }
 
   return (
     <div className="chat">
-      {/* <button
+      <button
         onClick={() => {
-          console.log(
-            new Date(messages[messages.length - 1]?.timestamp?.toDate())
-          );
+          console.log(messages);
         }}
       >
         Log Room Name
-      </button> */}
+      </button>
       <div className="chat-header">
         <Avatar src={`https://avatars.dicebear.com/api/human/${seed}.svg`} />
         <div className="chat-header-info">
@@ -99,7 +106,7 @@ function Chat() {
             }`}
           >
             <span className="chat-message-name">{message.name}</span>
-            {message.body}
+            {message.message}
             <span className="chat-message-time">
               {new Date(message.timestamp?.toDate()).toUTCString()}
             </span>

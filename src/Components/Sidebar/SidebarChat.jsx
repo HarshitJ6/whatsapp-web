@@ -2,16 +2,20 @@ import { Avatar } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import db from "../../firebase";
+import { useStateValue } from "../../StateProvider";
 import "./SidebarChat.css";
 
 function SidebarChat({ id, name, addNewChat }) {
   const [seed, setSeed] = useState("");
   const [messages, setMessages] = useState();
+  const [{ user, dbId }, dispatch] = useStateValue();
 
   useEffect(() => {
     // setSeed(Math.random() * 5000);
     if (id) {
-      db.collection("Rooms")
+      db.collection("profile")
+        .doc(dbId)
+        .collection("rooms")
         .doc(id)
         .collection("messages")
         .orderBy("timestamp", "desc")
